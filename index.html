@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VRS | Electronic Components</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- CSS VARIABLES --- */
+        :root {
+            --nav-bg: #131921; --subnav-bg: #232f3e;
+            --accent-orange: #f3a847; --accent-hover: #e39630;
+            --bg-gray: #eaeded; --text-dark: #0f1111;
+            --text-light: #ffffff; --link-blue: #007185;
+            --amz-color: #FF9900; --fk-color: #2874F0;
+            --transition: all 0.3s ease;
+        }
+
+        /* --- GLOBAL RESET --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-gray); color: var(--text-dark); overflow-x: hidden; }
+
+        /* --- HEADER & SEARCH --- */
+        header {
+            background-color: var(--nav-bg); color: var(--text-light);
+            display: flex; align-items: center; padding: 10px 20px; gap: 20px;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .logo { font-size: 24px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .logo span { color: var(--accent-orange); }
+
+        .search-bar { flex: 1; display: flex; border-radius: 4px; overflow: hidden; }
+        .search-bar input { width: 100%; padding: 10px 15px; border: none; outline: none; font-size: 16px; }
+        .search-bar button { background-color: var(--accent-orange); border: none; padding: 0 20px; cursor: pointer; font-size: 18px; transition: var(--transition); }
+        .search-bar button:hover { background-color: var(--accent-hover); }
+
+        .header-actions { display: flex; gap: 20px; align-items: center; }
+        .action-btn { background: none; border: none; color: white; cursor: pointer; font-size: 16px; display: flex; align-items: flex-end; gap: 5px; position: relative; }
+        .action-btn i { font-size: 24px; }
+        .badge {
+            position: absolute; top: -8px; right: -10px; background-color: var(--accent-orange); color: #000;
+            border-radius: 50%; padding: 2px 6px; font-size: 12px; font-weight: bold;
+        }
+
+        /* --- PRODUCT GRID --- */
+        .container { max-width: 1400px; margin: 20px auto 40px; padding: 0 20px; position: relative; z-index: 5; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .product-card {
+            background: white; padding: 20px; border-radius: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: var(--transition); display: flex; flex-direction: column; cursor: pointer;
+        }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
+        .product-img { width: 100%; height: 200px; object-fit: contain; margin-bottom: 15px; background: #ffffff; border-radius: 4px; padding: 10px; }
+        .product-title { font-size: 16px; font-weight: 400; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .product-card:hover .product-title { color: var(--accent-orange); }
+
+        /* Pricing Styles */
+        .pricing-info { display: flex; flex-direction: column; gap: 2px; margin-bottom: 15px; }
+        .mrp-box { font-size: 13px; color: #565959; text-decoration: line-through; }
+        .real-price { font-size: 24px; font-weight: 500; color: #B12704; }
+        .discount-badge { font-size: 13px; color: #007600; font-weight: bold; }
+
+        .add-to-cart {
+            background-color: #ffd814; border: 1px solid #fcd200; border-radius: 100px;
+            padding: 10px; cursor: pointer; font-size: 14px; margin-top: auto;
+            transition: var(--transition); box-shadow: 0 2px 5px rgba(213,217,217,.5); width: 100%;
+        }
+        .add-to-cart:hover { background-color: #f7ca00; }
+
+        /* --- MODALS / POPUPS --- */
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6);
+            display: none; justify-content: center; align-items: center; z-index: 1000; opacity: 0; transition: opacity 0.3s;
+        }
+        .overlay.active { display: flex; opacity: 1; }
+        .modal {
+            background: white; padding: 30px; border-radius: 8px; width: 90%; max-width: 850px;
+            position: relative; transform: scale(0.9); transition: var(--transition); max-height: 90vh; overflow-y: auto;
+        }
+        .overlay.active .modal { transform: scale(1); }
+        .close-btn { position: absolute; top: 15px; right: 15px; font-size: 28px; cursor: pointer; color: #666; border: none; background: none; z-index: 10; }
+
+        /* Compare Section */
+        .compare-section { margin-top: 20px; padding-top: 15px; border-top: 1px solid #ddd; }
+        .compare-buttons { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-amz, .btn-fk {
+            flex: 1; padding: 12px; text-align: center; color: white; border-radius: 4px;
+            text-decoration: none; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-amz { background-color: var(--amz-color); }
+        .btn-amz:hover { background-color: #e68a00; }
+        .btn-fk { background-color: var(--fk-color); }
+        .btn-fk:hover { background-color: #1a5ac6; }
+
+        @media (max-width: 768px) {
+            header { flex-wrap: wrap; }
+            .search-bar { order: 3; width: 100%; flex: none; margin-top: 10px; }
+            .compare-buttons { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo"><i class="fa-solid fa-microchip"></i> <span>VRS</span></div>
+        <div class="search-bar">
+            <input type="text" placeholder="Search components...">
+            <button><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
+        <div class="header-actions">
+            <!-- Cart Button triggers Cart Modal -->
+            <button class="action-btn" onclick="document.getElementById('cart-modal').classList.add('active'); document.body.style.overflow='hidden';">
+                <i class="fa-solid fa-cart-shopping"></i><span class="badge" id="cart-badge">0</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="product-grid">
+            
+            <!-- Product 1 -->
+            <!-- function format: openDynamicModal(Title, Image, MRP, RealPrice, Discount, [Features], AmazonLink, AmazonPrice, FlipkartLink, FlipkartPrice) -->
+            <div class="product-card" onclick="openDynamicModal('IR Photoelectric Sensor Module', ['./LM393-Photoelectric-Sensor-Module.png'], '72.00', '62.00', '13.89% OFF',['Detects nearby objects using infrared light','Senses objects without physical contact','Low power consumption and low-cost sensor'], 'https://amzn.in/d/0avFt6P7', '72.00','https://dl.flipkart.com/s/HSOo6NuuuN', '125.00')">
+                <img src="C:\Users\Admin\Desktop\VRS website\LM393-Photoelectric-Sensor-Module.png" alt="Motor" class="product-img">
+                <h3 class="product-title">IR Sensor Module</h3>
+                <div class="pricing-info">
+                    <span class="mrp-box">MRP: ₹72.00</span>
+                    <div><span class="real-price">₹62.00</span> <span class="discount-badge">13.89% OFF</span></div>
+                </div>
+                <!-- Cart Click Event -->
+                <button class="add-to-cart" onclick="addToCart('IR Sensor Module', 62.00, event)">Add to Cart</button>
+            </div>
+
+            <!-- Product 2 -->
+            <div class="product-card" onclick="openDynamicModal('Rain-Drop-Sensor-Module', './Rain-Drop-Sensor-Module_c6569039-5ab5-4f6d-b831-b999433ae484.png', '164.00', '82.00', '50% OFF', ['Detects the presence of rain or water droplets','Provides analog and digital output signals','Used for automatic rain detection systems'], 'https://amzn.in/d/0aZY8aqW', '169', 'https://dl.flipkart.com/s/HSFxCSuuuN', '164')">
+                <img src="C:\Users\Admin\Desktop\VRS website\Rain-Drop-Sensor-Module_c6569039-5ab5-4f6d-b831-b999433ae484.png" alt="PIR Sensor" class="product-img">
+                <h3 class="product-title">Rain-Drop-Sensor-Module</h3>
+                <div class="pricing-info">
+                    <span class="mrp-box">MRP: ₹164.00</span>
+                    <div><span class="real-price">₹82.00</span> <span class="discount-badge">50% OFF</span></div>
+                </div>
+                <button class="add-to-cart" onclick="addToCart('Rain-Drop-Sensor-Module', 82.00, event)">Add to Cart</button>
+            </div>
+
+            <!-- Product 3 -->
+            <div class="product-card" onclick="openDynamicModal('IR_Flame_Fire_Sensor_Module', './IR_Flame_Fire_Sensor_Module_1.png', '74.00', '64.00', '13.51% OFF', ['Detects flames using infrared radiation','Provides quick fire detection and alert','Offers analog and digital output signals'], 'https://www.amazon.in/Electronic-Spices-Smartsense-Temperature-Detecting/dp/B09MZ9H995/ref=sr_1_2?crid=AOATXEPP84D0&dib=eyJ2IjoiMSJ9.4iXc-RTObyAFehZp-bqrJN9fyaKqmDNEycN_FvIDKy5T7INtQW9uESVTOImQGxYq-JlnJZGZVpEcE-NNh-sYqtHQYNDPpO93Fcx6FlpNmI17FT-ObFHzI2i1i01nV1QM8DpMMBKY9k2N6_h3wTVF21TZZViyje9_GZUhgsduIItxhl--56YLUEIg1C3ug7-dN-hAIPqCkAx0kBjK_hNDhjmnfcbf7HxeWaVz_odLI_g52b5jOf6Ex7z5SuGswlJpmi7zAu3eVtxnMackniWXvBvIx7iN6YUCi_kACtfvij4.UTx-HTBMtsDkwkWfbHaaz7Viyvb20cVi4urFbaSg3gY&dib_tag=se&keywords=IR_Flame_Fire_Sensor_Module&qid=1784443876&sprefix=ir_flame_fire_sensor_module%2Caps%2C339&sr=8-2&th=1', '74.00', 'https://www.flipkart.com/shatam-ir-sensor-module-flame-sensor-object-detection-sensor-pack-1-electronic-components-hobby-kit/p/itm10cc0b1999d03?pid=EHKH9GK8PDJKRCRZ&lid=LSTEHKH9GK8PDJKRCRZTWJ252&marketplace=FLIPKART&q=IR_Flame_Fire_Sensor_Module&store=search.flipkart.com&srno=s_1_5&otracker=search&otracker1=search&fm=organic&iid=b5c93534-e678-4bf5-a27f-8fcad8ab4734.EHKH9GK8PDJKRCRZ.SEARCH&ppt=None&ppn=None&ssid=92ugbixvu80000001784443864350&qH=11db6418e266f965&ov_redirect=true&ov_redirect=true', '74.00')">
+                <img src="C:\Users\Admin\Desktop\VRS website\IR_Flame_Fire_Sensor_Module_1.png" alt="Arduino Uno" class="product-img">
+                <h3 class="product-title">IR_Flame_Fire_Sensor_Module</h3>
+                <div class="pricing-info">
+                    <span class="mrp-box">MRP: ₹74.00</span>
+                    <div><span class="real-price">₹64.00</span> <span class="discount-badge">13.51% OFF</span></div>
+                </div>
+                <button class="add-to-cart" onclick="addToCart('IR_Flame_Fire_Sensor_Module', 64.00, event)">Add to Cart</button>
+            </div>
+
+            <!-- Product 4 -->
+            <div class="product-card" onclick="openDynamicModal('Soil-Moisture-Sensor-Module', './Soil-Moisture-Sensor-Module_fb95af82-1067-4524-b782-6198ff80c276.png', '135.00', '70.00', '48.15% OFF', ['Measures the moisture level in soil','Helps automate plant watering systems','Provides analog and digital output signals'], 'https://www.amazon.in/RoboElectrixx-Moisture-Water-Sensor-Soil-Hygrometer-Detection/dp/B0BS5C3TLH/ref=sr_1_11?crid=3AT6CDDY42BXR&dib=eyJ2IjoiMSJ9.BzIgHT73-cgmRt3L83WE3YwmLLuGLPcfI68RVuIrh7Vi9iT_R8mW6ZnzTL1XgpwAipadfn59_mvwXyrXmznjDrIEbMiIs_S-o5mfpTVGXcw_ml7dEMb5cBg87X9SO9ujjlmXjXMSm8VElhRMt3GYsyF3aooNjnea1dzSu6_N2HPIjKRgV-PqO1YnD7Aan5ahdDVPn0VQM0Grc_ws6xcA4HKpu89wTZx_dj07qXnZS3uyrkknKqTtvO1nf1svVqV7H2uTHsVN9Hs-GQlrbiq50r4Rue-gPf366Qcq1vknbIY.ryd9DZWdm3Hm8vY3VPJDo-_U3H8gYWwa8soA6hU3g2g&dib_tag=se&keywords=Soil-Moisture-Sensor-Module&qid=1784444076&sprefix=soil-moisture-sensor-module%2Caps%2C255&sr=8-11', '149.00', 'https://www.flipkart.com/shanaa-espot-soil-humidity-sensor-hygrometer-5v-moisture-sensor-module-educational-electronic-hobby-kit/p/itm3c1a1a44229d6?pid=EHKHCJWYNVYKF8TT&lid=LSTEHKHCJWYNVYKF8TTR0YPCT&marketplace=FLIPKART&q=Soil-Moisture-Sensor-Module&store=tng%2Ft4r&srno=s_1_2&otracker=search&otracker1=search&fm=organic&iid=f0f11381-a0d1-4b79-9f50-331cb110cb7a.EHKHCJWYNVYKF8TT.SEARCH&ppt=None&ppn=None&ssid=ahp604rx3k0000001784444042732&qH=0cbf1553fba2e349&ov_redirect=true&ov_redirect=true', '135.00')">
+                <img src="C:\Users\Admin\Desktop\VRS website\Soil-Moisture-Sensor-Module_fb95af82-1067-4524-b782-6198ff80c276.png" alt="IR Sensor" class="product-img">
+                <h3 class="product-title">Soil-Moisture-Sensor-Module</h3>
+                <div class="pricing-info">
+                    <span class="mrp-box">MRP: ₹135.00</span>
+                    <div><span class="real-price">₹70.00</span> <span class="discount-badge">48.15% OFF</span></div>
+                </div>
+                <button class="add-to-cart" onclick="addToCart('Soil-Moisture-Sensor-Module', 36.00, event)">Add to Cart</button>
+            </div>
+
+            <!-- Product 5 -->
+            <div class="product-card" onclick="openDynamicModal('Water-Level-Depth-Sensor-Module', './Water-Level-Depth-Sensor-Module.png', '141.00', '56.99', '59.57% OFF', ['Detects the level of water in a container','Measures water depth accurately','Provides analog output for water level monitoring'], 'https://www.amazon.in/Robodo-Electronics-REL_35-Detection-Arduino/dp/B00PTXZNUA/ref=sr_1_3?crid=2PZN3Y51I2OE9&dib=eyJ2IjoiMSJ9.rg4htkGN3OMHJsNmPyEcIoGZLlYc0AdNDX5-Z9YG2H3i-jYoEysglcTz-VF4nMpj3QN3EUDLmzagPPj7GH_m-EmYPZQQd1NhTVfHJzj5u9dYsRjHt93-ZnMxfBL9KDOQVGS0uCvyzTsOOnbJuchvJPmZ4whS6iEyNd2DBbFB4K_0oVHZ_f7cSj4rURpEAOEMWaGh2qtY8UzZs1M4EAA7Z_5AwDEYJWMOrvAVGXkpO6z7YjXaEEoZi7gvhAWKHjZe2JxDZ5BmUCpWWBQOXmF5phKHkeeKkFQi2xZP6_3SqTY.oE17BWdY6Ki3Y28ZuPbilaqZeUn3Kg4xw9jJZTfBIFM&dib_tag=se&keywords=Water-Level-Depth-Sensor-Module&qid=1784444404&sprefix=water-level-depth-sensor-module%2Caps%2C265&sr=8-3', '169.00', 'https://www.flipkart.com/prakti-enterprises-water-level-sensor-depth-detection-arduino-high-sensitive-electronic-components-hobby-kit/p/itmfa4e9f440e40e?pid=EHKH6EXGUGZCAKRX&lid=LSTEHKH6EXGUGZCAKRXCTDCQJ&marketplace=FLIPKART&q=Water-Level-Depth-Sensor-Module&store=tng%2Ft4r&srno=s_1_6&otracker=search&otracker1=search&fm=Search&iid=9646a9ce-c63d-4d4d-bd97-ef3f7a79cd36.EHKH6EXGUGZCAKRX.SEARCH&ppt=sp&ppn=sp&ssid=fs6kpx11800000001784444394460&qH=ee1e202c32e5bc02&ov_redirect=true&ov_redirect=true', '141.00')">
+                <img src="C:\Users\Admin\Desktop\VRS website\Water-Level-Depth-Sensor-Module.png" alt="Touch Sensor" class="product-img">
+                <h3 class="product-title">Water-Level-Depth-Sensor-Module</h3>
+                <div class="pricing-info">
+                    <span class="mrp-box">MRP: ₹141.00</span>
+                    <div><span class="real-price">₹56.99</span> <span class="discount-badge">59.57% OFF</span></div>
+                </div>
+                <button class="add-to-cart" onclick="addToCart('Water-Level-Depth-Sensor-Module', 56.99, event)">Add to Cart</button>
+            </div>
+
+            <!-- Product 6 -->
+            <!-- <div class="product-card" onclick="openDynamicModal('Light Detection Sensor Module', 'https://placehold.co/400x400/ffffff/333333?text=Light+Sensor', '75.00', '49.50', '34% OFF', ['LDR based module', 'Adjustable threshold', 'Operating voltage 3.3V-5V'], '#', '60.00', '#', '52.00')"> -->
+                <!-- <img src="https://placehold.co/400x400/ffffff/333333?text=Light+Sensor" alt="Light Sensor" class="product-img"> -->
+                <!-- <h3 class="product-title">Light Detection Sensor Module (LDR)</h3> -->
+                <!-- <div class="pricing-info"> -->
+                    <!-- <span class="mrp-box">MRP: ₹75.00</span> -->
+                    <!-- <div><span class="real-price">₹49.50</span> <span class="discount-badge">34% OFF</span></div> -->
+                <!-- </div> -->
+                <!-- <button class="add-to-cart" onclick="addToCart('Light Detection Sensor Module (LDR)', 49.50, event)">Add to Cart</button> -->
+            <!-- </div> -->
+
+            <!-- Product 7 -->
+            <div class="product-card" onclick="openDynamicModal('4_x_AA_Black_Plastic_Storage_Box_Case_Holder_with_Cover_and_ON_OFF_Switch', './4_x_AA_Black_Plastic_Storage_Box_Case_Holder_with_Cover_and_ON_OFF_Switch.png', '148.00', '51.00', '65.54% OFF', ['Holds four AA batteries securely','Includes ON/OFF switch for power control','Provides portable power to electronic circuits'], 'https://www.amazon.in/SHOKITECH-Battery-Holder-Storage-Switch/dp/B0F56KYXJK/ref=sr_1_9?crid=HQSONF90BMLZ&dib=eyJ2IjoiMSJ9.KZpHKP5UvLVjtvsnYcc55DeIKckx17CisausmQwzhn0K4Y2wm9mOlE79uQSKo8j61i1RvbcEJ-Hycsbhcw3ADKpWe6jxXlfT13XSmgF8r_83QSZPXkdO1_jwa8BM2Q66NFx37sncm_U5V2G4Ua2CqW_oKDlIcxhidkixfhl0DsFEk6YsZMZBfgO7ddT_8Ay2k8SdnuUOnS2eJp78TuMydeEcRp-ZAC8cGjvXIZUI8dfTZ9ELtn01aOapBtDiZFuQGnmioqrsCt2SrUY-qBYTHYMe7SylS4fBmOHfuU4tKw8.qJr-YNlaKSxCiqjXNPzsnwAzyQ_3adha5QURy2Ci6zs&dib_tag=se&keywords=black+plastic+storage+box+case+holder&qid=1784444515&sprefix=black_plastic_storage_box_case_holder%2Caps%2C254&sr=8-9', '141.00', 'https://www.flipkart.com/trustech-black-plastic-storage-box-case-holder-battery-4-x-aa-cell-box-dc-power-plug-electronic-components-hobby-kit/p/itm121276a6da80f?pid=EHKG9DNYCJFRXXCF&lid=LSTEHKG9DNYCJFRXXCFCGM5DN&marketplace=FLIPKART&q=4+x+AA+Battery+Holder+Storage+Box+with+On%2FOff+Switch&store=tng%2Ft4r&srno=s_1_3&otracker=search&otracker1=search&fm=Search&iid=089154c2-542b-44ab-86aa-4a21bcefc0ef.EHKG9DNYCJFRXXCF.SEARCH&ppt=sp&ppn=sp&ssid=g9afqf3l1c0000001784444733551&qH=34ada26f3d32e98d&ov_redirect=true&ov_redirect=true', '148.00')">
+                <img src="C:\Users\Admin\Desktop\VRS website\4_x_AA_Black_Plastic_Storage_Box_Case_Holder_with_Cover_and_ON_OFF_Switch.png" alt="Resistors" class="product-img">
+                <h3 class="product-title">4 x AA Black_Plastic_Storage_Box_Case_Holder</h3>
+                <div class="pricing-info">
+                    <span class="mrp-box">MRP: ₹148.00</span>
+                    <div><span class="real-price">₹51.00</span> <span class="discount-badge">65.54% OFF</span></div>
+                </div>
+                <button class="add-to-cart" onclick="addToCart('4 x AA Black_Plastic_Storage_Box_Case_Holder', 51.00, event)">Add to Cart</button>
+            </div>
+
+            <!-- Product 8 -->
+            <div class="product-card" onclick="openDynamicModal('FemaletoFemaleConnectingWires_JumperWires', './FemaletoFemaleConnectingWires_JumperWires_Setof40_2.png', '129.00', '60.00', '53.49% OFF', ['Connect electronic components without soldering','Available in male-to-male, male-to-female, and female-to-female types','Reusable and easy to use for prototyping'], 'https://www.amazon.in/Electron-Jumper-Female-breadboard-jumper/dp/B0CVFDCW7D/ref=sr_1_7?crid=2EGUI2LDD9HES&dib=eyJ2IjoiMSJ9.bQJloSIw-F14MKxp6mtFqXhZ1g4L-dE9ZlAAkJ8tLAUiyfiHl1bBvqCmVGKxXZr8zmqw9H3eUvh_XbRIH_9txOdmwUaXIyDFHT-DJmD78iliqLIpLC7SuHyew9Xu2ptoi79YP4D6ujkPHwpjdDFx4eSmkEMKJsL5b1lhkHU9w3pic9zWewK7n7Jhmktrg0ISzkNFC4YPxn4BXu0-YsXX0lG_4jnO-ozgIPAEYPRIo7ksa-CkFslD4gDeQXbjTxhLKYM-J2-QaIcaPhvCJIb_93YXz4jlwnsDxlLcdwEreAA.M9izxvaYetfY9zIrN-n9Y_B_bKTrvpjt0D2fSeZczyM&dib_tag=se&keywords=10+jumper+wires&qid=1784445095&sprefix=10+jumper+wires%2Caps%2C286&sr=8-7', '129.00', 'https://www.flipkart.com/tinkro-jumper-wire-10-male-female-electronic-components-hobby-kit/p/itm3d2f8e32ea000?pid=EHKHKYXKYNA8CX5U&lid=LSTEHKHKYXKYNA8CX5U3QQMXT&marketplace=FLIPKART&q=10+jumper+wies&store=tng%2Ft4r&srno=s_1_6&otracker=search&otracker1=search&fm=Search&iid=04100f5c-d17a-4ba3-a456-19e0f1eed023.EHKHKYXKYNA8CX5U.SEARCH&ppt=sp&ppn=sp&ssid=m2dpo4epc00000001784444945367&qH=a0674a38e20f7d5c&ov_redirect=true&ov_redirect=true', '135.00')">
+                <img src="C:\Users\Admin\Desktop\VRS website\FemaletoFemaleConnectingWires_JumperWires_Setof40_2.png" alt="Breadboard" class="product-img">
+                <h3 class="product-title">ConnectingWires_JumperWires(Pack of 15)</h3>
+                <div class="pricing-info">
+                    <span class="mrp-box">MRP: ₹129.00</span>
+                    <div><span class="real-price">₹60.00</span> <span class="discount-badge">53.49% OFF</span></div>
+                </div>
+                <button class="add-to-cart" onclick="addToCart('ConnectingWires_JumperWires(Pack of 15)', 60.00, event)">Add to Cart</button>
+            </div>
+
+            <!-- Product 9 -->
+            <div class="product-card" onclick="openDynamicModal('Small-Breadboard', './Small-Breadboard.png', '119.00', '84.00', '29.41% OFF', ['M/M, M/F, F/F variations', 'Length: 20cm', 'Copper wire'], 'https://amzn.in/d/05XRpg9O', '119.00', 'https://www.flipkart.com/vincentvolt-400-tie-points-solderless-breadboard-electronic-components-hobby-kit/p/itmb774587b46ee7?pid=EHKHF59XXURJVMEK&lid=LSTEHKHF59XXURJVMEKF3CGHU&marketplace=FLIPKART&q=small+breadboard+400+points&store=tng%2Ft4r&srno=s_1_3&otracker=search&otracker1=search&fm=Search&iid=7e259213-f395-47d4-b47f-10ea41ad54cb.EHKHF59XXURJVMEK.SEARCH&ppt=sp&ppn=sp&ssid=adckm4zxds0000001784445316532&qH=de5ac405b570f171&ov_redirect=true&ov_redirect=true', '171.00')">
+                <img src="C:\Users\Admin\Desktop\VRS website\Small-Breadboard.png" alt="Wires" class="product-img">
+                <h3 class="product-title">Small-Breadboard(contains 400 points)</h3>
+                <div class="pricing-info">
+                    <span class="mrp-box">MRP: ₹119.00</span>
+                    <div><span class="real-price">₹84.00</span> <span class="discount-badge">29.41% OFF</span></div>
+                </div>
+                <button class="add-to-cart" onclick="addToCart('Small-Breadboard(contains 400 points)', 84.00, event)">Add to Cart</button>
+            </div>
+
+            <!-- Product 10 -->
+            <div class="product-card" onclick="openDynamicModal('3V_Miniature_DC_Motor', '3V_Miniature_DC_Motor.jpg', '30.00', '18.00', '40% OFF', ['Allows solderless circuit prototyping','Reusable for testing electronic circuits','Provides easy component insertion and removal'], 'https://www.amazon.in/Vincentvolt-2500rpm-3V-9V-Speed-Electric/dp/B0CY57PFYW/ref=sr_1_45?crid=YRCMBT5J55JG&dib=eyJ2IjoiMSJ9.WXeR3cw2hUaaQqsu_zlHAnEZLzcvwLd4N16db-O5JjxMEzMsQemllS1-ZXWb1o6bJgnj9KnhglGU5xAtQCBwfXoPWmNgvPesfCYT-QHU7UXNvz4sh1MhWg98ScsrRlfMthVo8Cd4erxjVWqpMXU7BPLZp_OKi3GZYPj-gRHBqnxwpxc_6fbgIdrtgvLQJOirK2MSgR8QuIhanOv6TAc06NQadN0JBMdoxsmljy7uNsRySdn2lJ9IqWeVkCemLUDF-sYNmKdMSQr1cPt7WtNopvfevaZJmLbXDtXkYpfLoik.7Kd8i0KKc5kSTSgyp7yxFftsuShxnz9_9XTtudNKqn0&dib_tag=se&keywords=3v+dc+motor+150&qid=1784446018&sprefix=3v+dc+motor+150%2Caps%2C290&sr=8-45', '30.00', 'https://www.flipkart.com/erhindia-10-pcs-models-small-electric-toy-motor-kit-3v-6v-dc-kids-electronic-components-hobby/p/itm00f1d7de521ec?pid=EHKGKWB2KUZHHZ85&lid=LSTEHKGKWB2KUZHHZ85SYQHQS&marketplace=FLIPKART&q=3v+dc+motor+150&store=tng%2Ft4r&srno=s_1_4&otracker=search&otracker1=search&fm=Search&iid=de8309e0-751d-44e1-aed2-478ccab0842e.EHKGKWB2KUZHHZ85.SEARCH&ppt=sp&ppn=sp&ssid=bp67pwrbc00000001784446114053&qH=20126500bd13f175&ov_redirect=true&ov_redirect=true', '30.02')">
+                <img src="3V_Miniature_DC_Motor.jpg" alt="Motor Driver" class="product-img">
+                <h3 class="product-title">3V DC_Motor</h3>
+                <div class="pricing-info">
+                    <span class="mrp-box">MRP: ₹30.00</span>
+                    <div><span class="real-price">₹18.00</span> <span class="discount-badge">40% OFF</span></div>
+                </div>
+                <button class="add-to-cart" onclick="addToCart('3V DC_Motor', 18.00, event)">Add to Cart</button>
+            </div>
+
+            <!-- Product 11 -->
+            <div class="product-card" onclick="openDynamicModal('DC Motor Fan Blade', './DCMotorFanBlade2-WingForToyMotorPropellerBlade-5.8Inches_1.png', '80.00', '8.00', '90% OFF', ['Creates airflow when attached to a DC motor','Lightweight for efficient motor operation','Used in cooling and ventilation projects'], 'https://www.amazon.in/INVENTO-Blade-Propeller-Science-Projects/dp/B08BK7JCTW/ref=sr_1_66?crid=2FNF4AQ4PZ9VJ&dib=eyJ2IjoiMSJ9.gucPlZGDzYVwe8_wWwsd8K5NyuMMv-d6dXfC7NGnhZsCn1a3dN2_WVIHebl93HAXK1V1e-PjDoniJQ2UsbibEjumgCQVZmy5V039xLoO8dLwfWt0VTC49XqIqrXMO7LIuiQoYlZQfA6XgFWSgdVAqYZ0S7PcfkQa_yp4R-rtCEFKUlMuehOSbgmdB_Pz3oihYacNE-tWpjmW9bMSZv1nXmxSAyheO8oCsuE7gCvvBxCRRgLbFnxTy-GU_e8u6FyQCTiVk_wG5DDYyxgMS5SZuaApAEzQfZzHGffch2AXDUY.QTLyW8b6Bis7mRsJG-rI4dfmFZNUJ3epimP0qG3_4II&dib_tag=se&keywords=DC+Motor+Fan+Blade+2-Wing&qid=1784486120&sprefix=dc+motor+fan+blade+2-wing+%2Caps%2C265&sr=8-66&xpid=5jSCHSruFzJ8r', '46.00', 'https://www.flipkart.com/ak-electro-2-pcs-fan-power-supply-electronic-hobby-kit/p/itmfe769dc65da3e?pid=EHKHH97AQUY8TZH9&lid=LSTEHKHH97AQUY8TZH9FZPXLK&marketplace=FLIPKART&q=dc+motor+fan+&store=tng%2Ft4r&srno=s_1_38&otracker=search&otracker1=search&fm=Search&iid=4dad52de-aa5e-4820-b810-9fc964eb0c27.EHKHH97AQUY8TZH9.SEARCH&ppt=sp&ppn=sp&ssid=exnrz9t4jk0000001784486289436&qH=619ca6cf631e9a44&ov_redirect=true&ov_redirect=true', '80.00')">
+                <img src="C:\Users\Admin\Desktop\VRS website\DCMotorFanBlade2-WingForToyMotorPropellerBlade-5.8Inches_1.png" alt="ESP32" class="product-img">
+                <h3 class="product-title">DC Motor Fan Blade</h3>
+                <div class="pricing-info">
+                    <span class="mrp-box">MRP: ₹80.00</span>
+                    <div><span class="real-price">₹8.00</span> <span class="discount-badge">90% OFF</span></div>
+                </div>
+                <button class="add-to-cart" onclick="addToCart('DC Motor Fan Blade', 8.00, event)">Add to Cart</button>
+            </div>
+
+            <!-- Product 12 -->
+            <div class="product-card" onclick="openDynamicModal('Light-Detection-Sensor-Module', './Light-Detection-Sensor-Module.png', '135.00', '70.00', '48.15% OFF', ['Detects ambient light intensity automatically','Changes output based on light levels','Provides analog and digital output signals'], 'https://www.amazon.in/Electron-LM393-Photosensitive-light-dependent/dp/B0FNXRSLHH/ref=sr_1_7?crid=KXBS02QYRCV0&dib=eyJ2IjoiMSJ9.DLy4TnUEKnqLGVV3vGqV9yJDMmc8bCVEwLnR-hkXd1T0VIBE5jaeMneS4geCVtRc0OT_bqIlJWKFeUBjLeW6ojY6EWaF-o2znif8XHZ0YKD0Y6sIwtiwd8KENvVyXmKpOGe6HIDk5cWqRO6_CkOy6aRFFL_uHSL3CgNiogsKY1JTPwrHLjFqh3tInOR_1suVHcZJUrYUzcUOFqvJiU4-C2vjjOTA3lTTK_OK0ZMjYX5T3TbMZE3jNtXa-718TfzhEOy5pzAsTpOxU4TPwi8m0R9miA_aZKKM03rrCvMgTkI.TTeFBxdXXkQNKwsDNGGc0q2rNZ9XS7SjBx_OHnYkFSM&dib_tag=se&keywords=Light-Detection-Sensor-Module&qid=1784446216&sprefix=light-detection-sensor-module%2Caps%2C284&sr=8-7', '129.00', 'https://www.flipkart.com/khyrud-ldr-optical-photosensitive-light-detection-sensor-module-board-electronic-components-hobby-kit/p/itm2f338415a69ae?pid=EHKHZGZTTMZHMJQF&lid=LSTEHKHZGZTTMZHMJQFEVPA69&marketplace=FLIPKART&q=Light-Detection-Sensor-Module&store=tng%2Ft4r&srno=s_1_1&otracker=search&otracker1=search&fm=organic&iid=50114e39-abe7-444f-99de-91472ac4c313.EHKHZGZTTMZHMJQF.SEARCH&ppt=None&ppn=None&ssid=ok5p7w52yo0000001784446209853&qH=c71aa3c3d9b5c3a8&ov_redirect=true&ov_redirect=true', '135.00')">
+                <img src="C:\Users\Admin\Desktop\VRS website\Light-Detection-Sensor-Module.png" alt="Ultrasonic" class="product-img">
+                <h3 class="product-title">Light-Detection-Sensor-Module</h3>
+                <div class="pricing-info">
+                    <span class="mrp-box">MRP: ₹135.00</span>
+                    <div><span class="real-price">₹70.00</span> <span class="discount-badge">41% OFF</span></div>
+                </div>
+                <button class="add-to-cart" onclick="addToCart('Light-Detection-Sensor-Module', 70.00, event)">Add to Cart</button>
+            </div>
+
+            <!-- Product 13 -->
+            <div class="product-card" onclick="openDynamicModal('AA battery panasonic', './AA battery panasonic.png', '60.00', '45.00', '25% OFF', ['Provides stable power for electronic devices','Long-lasting and reliable energy source','Easy to replace and widely available'], 'https://www.amazon.in/Nippo-Leakproof-10-Guaranteed-Non-Rechargeable/dp/B0C73P1BWT/ref=sr_1_5_sspa?crid=5PVMK9D4FB3J&dib=eyJ2IjoiMSJ9.3Z1CnP6yF9HH9mcEClI1q5JCDhxDGozrCv_NIxcAPkg3HT3o4v-E8L9Sq-4qQRumWk3CXimUmwD56lpx2qHjKAB9Y3GubSHeqzuq9EouG2Z0a5K1fg_FkhfzhqfLhdg0IqhPJnU4Aunt1efE_1Z1O9xD_Bb-bDtbAeu_yJabw3qUt7R5SrNd1ghOc8R_HxIzP99K67INWcA8ar2W8ZNxs5FkluZOwGGuu5Ch2lkvFBw.zzmk68GBVgBwHBu9HsUXFpnY-vDLRlUhzZHYcoWpbPY&dib_tag=se&keywords=aaa%2Bpanasonic%2Bbattery&qid=1784446637&sprefix=AA%2Bpanasonic%2Bbattery%2Caps%2C354&sr=8-5-spons&aref=y5BJ1eX8Ii&sp_csd=d2lkZ2V0TmFtZT1zcF9tdGY&th=1', '20.09', 'https://www.flipkart.com/panasonic-aa-goldplus-1-5v-r6ndg-1b10-battery-pack-20/p/itmfgqyrvszkpqar?pid=ACCFGPWGX25MDU25&lid=LSTACCFGPWGX25MDU258VGZXI&marketplace=FLIPKART&q=AA+panasonic+battery&store=tyy%2F4mr%2Fw65&srno=s_1_10&otracker=search&otracker1=search&fm=Search&iid=cc900c64-2dc7-47fb-ad20-35898c7780b7.ACCFGPWGX25MDU25.SEARCH&ppt=sp&ppn=sp&qH=eaa77869a155e58a&ov_redirect=true&ov_redirect=true', '17.90')">
+                <img src="C:\Users\Admin\Desktop\VRS website\AA battery panasonic.png" alt="Servo" class="product-img">
+                <h3 class="product-title">AA battery panasonic(pack of 3)</h3>
+                <div class="pricing-info">
+                    <span class="mrp-box">MRP: ₹60.00</span>
+                    <div><span class="real-price">₹45.00</span> <span class="discount-badge">25% OFF</span></div>
+                </div>
+                <button class="add-to-cart" onclick="addToCart('AA battery panasonic', 45.00, event)">Add to Cart</button>
+            </div>
+
+            <!-- Product 14 -->
+            <div class="product-card" onclick="openDynamicModal('3V to 12 VBuzzer', '3V to 12 VBuzzer.png', '57.00', '29.00', '28% OFF', ['Produces sound alerts or alarm signals','Operates on 3V to 12V DC supply','Low power consumption and easy to use'], 'https://www.amazon.in/ELECTRO-1PIECES-Buzzer-Enclosed-Project/dp/B0GDQDW29P/ref=sr_1_3?crid=342EESBFCEXD4&dib=eyJ2IjoiMSJ9.01PuEy-Pab5Fz2khNrhwQlFinFj-WIaJy5Uwb6U7FhlHcvLopsNVJHRtZ-nuMCADJF-IMsV3Vnq2k0bPjVNsVaukoytR7CQB-TDQockh6QiUr-i3PZgKfi4VRDvIj-2puhy1SRga-i28cB6rDm8Y8C-txgIf-V-EJTF6yj7RFdRmd6PocWs3JBHzjHZrcDcWR7NtHTjICSB_nlchHbqVd3wcbjLCv09XF5qSepv0v7PHyHWOteGMWAz6EyqE8nVvZSpygR7VzolasY5hY7IIS6J8Q1XaOioUfqei0QOBFCM.prDTeR_onJa4ZDV-ji517dKmn8qayhA-mOsa-sed9sA&dib_tag=se&keywords=3v+to+12v+buzzer&qid=1784447063&sprefix=3v+to+12+vbuzzer%2Caps%2C256&sr=8-3', '50.00', 'https://www.flipkart.com/prowans-12-volt-active-buzzer-motor-bike-electronics-projects-pizo-2pcs-electronic-components-hobby-kit/p/itmd5a09dbc2b939?pid=EHKGK98EZTWKWGTY&lid=LSTEHKGK98EZTWKWGTYWO5CDU&marketplace=FLIPKART&q=3V+to+12+V+Buzzer&store=tng%2Ft4r&srno=s_1_27&otracker=search&otracker1=search&fm=Search&iid=43dfe10d-0552-4093-b301-535069511b03.EHKGK98EZTWKWGTY.SEARCH&ppt=sp&ppn=sp&ssid=4dllqlbwz40000001784447166285&qH=47f0fa2b11d6b044&ov_redirect=true&ov_redirect=true', '57.00')">
+                <img src="C:\Users\Admin\Desktop\VRS website\3V to 12 VBuzzer.png" alt="LCD" class="product-img">
+                <h3 class="product-title">3V to 12 VBuzzer</h3>
+                <div class="pricing-info">
+                    <span class="mrp-box">MRP: ₹57.00</span>
+                    <div><span class="real-price">₹29.00</span> <span class="discount-badge">28% OFF</span></div>
+                </div>
+                <button class="add-to-cart" onclick="addToCart('13V to 12 VBuzzer', 29.00, event)">Add to Cart</button>
+            </div>
+
+            <!-- Product 15 -->
+            <div class="product-card" onclick="openDynamicModal('LED light', './LED light.png', '53.30', '25.00', '49.15% OFF', ['Emits bright light when powered','Low power consumption and long lifespan','Available in multiple colors for indication'], 'https://www.amazon.in/SHARVI-ELECTRONICS-5mm-Emitting-EVERLIGHT/dp/B0DVTGZTBL/ref=sr_1_52?crid=L3SWX8DJMWH&dib=eyJ2IjoiMSJ9.mWVrPg60zOlb-o6JRHSSadyJYMZiaXKhCL0XtRxT6G3fT-5dccxJu2B0ZT8JabIitYhSwiF-aGQsrXNnjUf06DGNyYSCLZCbiVPj-Qi0SQEQM9LwPai5rp2ujJLeEi-cAT7URSGV6XAptWZ4G1CMRuBo8sHIG7FgHsf42UzLAAz_4_AVkfV-_Ctj7uET-aF-AjEy1DMl8NSBtOextDJ3Eg3XFNMytQt_zAmIpSePAARK8s2nBe2LWz8f71xBnKY0Ss180ct3deicuN_iJ8V2E7h92I47lbDGP1sQrew3Vtk.3ZXj5v4XC09Qblhydg2ZJ7Ysb7nECfFtO1fRtRMPfG8&dib_tag=se&keywords=led%2B5mm&qid=1784447758&sprefix=led%2B5mm%2Caps%2C492&sr=8-52&th=1', '53.3', 'https://www.flipkart.com/gobagee-25pcs-5mm-diffused-led-diodes-assortment-kit-round-head-5-colors-5pcs-each-light-electronic-hobby-kit/p/itm6d172b02d1f60?pid=EHKHK5G7TJC8X9FN&lid=LSTEHKHK5G7TJC8X9FNDMVTDI&marketplace=FLIPKART&q=led+light+5mm&store=tng%2Ft4r&srno=s_1_7&otracker=search&otracker1=search&fm=Search&iid=f989e0b0-744a-4545-8741-276ec1b7c250.EHKHK5G7TJC8X9FN.SEARCH&ppt=sp&ppn=sp&ssid=ct7de2qeao0000001784447454582&qH=09cc546408f72080&ov_redirect=true&ov_redirect=true', '42')">
+                <img src="C:\Users\Admin\Desktop\VRS website\LED light.png" alt="Relay" class="product-img">
+                <h3 class="product-title">LED light(pack of 10)</h3>
+                <div class="pricing-info">
+                    <span class="mrp-box">MRP: ₹53.30</span>
+                    <div><span class="real-price">₹25.00</span> <span class="discount-badge">49.15% OFF</span></div>
+                </div>
+                <button class="add-to-cart" onclick="addToCart('LED light', 25.00, event)">Add to Cart</button>
+            </div>
+
+            <!-- Product 16 -->
+            <div class="product-card" onclick="openDynamicModal('Push-Button-_2-Pin', './Push-Button-_2-Pin-Tactile-Micro-Switch.png', '22.38', '10.00', '35% OFF', ['Provides momentary ON/OFF switching','Operates when pressed by the user','Easy to use in electronic circuits'], 'https://www.amazon.in/Chauhan-AbhiyantrikiTM-Tactile-Switch-Micro/dp/B07GD1R77F/ref=sr_1_3?crid=1ZN3E706YMWHY&dib=eyJ2IjoiMSJ9.mUVNV7BkNR7IZCPAAdZ9IgW9upTzkVIYrDsGBYDAUctd_XfqPHHSWz_7-FdgejP1Tq764dkEjSk5scpR4oZwh2XhCLfx7jsEmPRTyYw_AOMnotO3qG4Ug2gVGZM1QjW737xFuhe05CrUPoQnTqlEw6AxENVRoxr7gAcBfBa5ipuUc-GTA8R3LwDXN0t4ygz7wrSrGJAvYO_F0-L3DUKS35KVxMdorittua8_6iBXF57TK2o2rAcZ6Ju0Up2M-BPiFz8D6pVVBAKiiLrBkIZjXhp5ukOWiryp_FEfPsd1gYw.ymczEMF8diBykA6pRz9dFYrz7xbk11xTzmehghrp9Jc&dib_tag=se&keywords=Push-Button-_2-Pin&qid=1784447977&sprefix=push-button-_2-pin+%2Caps%2C291&sr=8-3', '10.00', 'https://www.flipkart.com/gobagee-2-pin-tactile-switch-micro-push-button-pack-10-interconnect-electronic-hobby-kit/p/itm566e8086bb551?pid=EHKG2K2U8DEDBHWM&lid=LSTEHKG2K2U8DEDBHWMLV1MRM&marketplace=FLIPKART&q=Push-Button-_2-Pin+&store=tng%2Ft4r&srno=s_1_5&otracker=search&otracker1=search&fm=Search&iid=a4ba1715-2ff5-42e4-9cbd-74a1a180974a.EHKG2K2U8DEDBHWM.SEARCH&ppt=sp&ppn=sp&ssid=i7p7m959280000001784447965314&qH=7082aeff0e6c60a8&ov_redirect=true&ov_redirect=true', '11.19')">
+                <img src="C:\Users\Admin\Desktop\VRS website\Push-Button-_2-Pin-Tactile-Micro-Switch.png" alt="Iron" class="product-img">
+                <h3 class="product-title">Push-Button-_2-Pin(pack of 2)</h3>
+                <div class="pricing-info">
+                    <span class="mrp-box">MRP: ₹22.38</span>
+                    <div><span class="real-price">₹10.00</span> <span class="discount-badge">54.55% OFF</span></div>
+                </div>
+                <button class="add-to-cart" onclick="addToCart('Push-Button-_2-Pin(pack of 2)', 10.00, event)">Add to Cart</button>
+            </div>
+
+            <!-- Product 17 -->
+            <div class="product-card" onclick="openDynamicModal('Channel-Capacitive-Touch-Sensor', './TTP223-1-Channel-Capacitive-Touch-Sensor.png', '148.00', '55.00', '62.84% OFF', ['Detects touch using capacitive sensing','Provides digital output on touch detection','Low power consumption and high sensitivity'], 'https://www.amazon.in/Circuit-components-Channel-Capacitive-Digital/dp/B0BKLQC48V/ref=sr_1_4?crid=3NQ5MEDNQRX9V&dib=eyJ2IjoiMSJ9.v0EDro5XFkbwscGLN5Suo2UPogyjjfDpa6Li8ME79Zb3bvlk7TiYlAP6mKzl68B_t-8M1ktNH5KVrEAJlbqpV71bW-xUZVOLiGQtbZXDelx6ax1KPs85KWCNE948WCUM_NBS4W1qlRlivNWCED7teLq0kLiWrZN_Dz_d58seXGYE9P7nSxEyGSxG3Pv1FCH2GqrgU7re8lKMLZJNKhIFyKAcePAkLuKu99yBcS6q1MEj2vxq1vWDA4GGdvQZlMJFhrGYUxYzrKyAGxZoGGpSi2Fa2kZuY0VhHBUkXgQ-1gU.Tj0zq1D9AuaVnvGNcWOy9DuP68j7dYj8hwAGl8EgRaI&dib_tag=se&keywords=Channel-Capacitive-Touch-Sensor&qid=1784448132&sprefix=channel-capacitive-touch-sensor%2Caps%2C324&sr=8-4', '90.00', 'https://www.flipkart.com/ak-bot-tech-touch-sensor-blue-electronic-components-hobby-kit/p/itmac60847006563?pid=EHKHNZ69SHKRKJQJ&lid=LSTEHKHNZ69SHKRKJQJOIVRHK&marketplace=FLIPKART&q=Channel-Capacitive-Touch-Sensor&store=search.flipkart.com&srno=s_3_101&otracker=search&otracker1=search&fm=Search&iid=f15c4547-1f0f-4e54-a83a-c10ea5c89bf7.EHKHNZ69SHKRKJQJ.SEARCH&ppt=sp&ppn=sp&ssid=zhkcxd96k00000001784448222851&qH=d7b893e46bbb655e&ov_redirect=true&ov_redirect=true', '148.00')">
+                <img src="C:\Users\Admin\Desktop\VRS website\TTP223-1-Channel-Capacitive-Touch-Sensor.png" alt="IC" class="product-img">
+                <h3 class="product-title">TTP223-1-Channel-Capacitive-Touch-Sensor</h3>
+                <div class="pricing-info">
+                    <span class="mrp-box">MRP: ₹148.00</span>
+                    <div><span class="real-price">₹55.00</span> <span class="discount-badge">62.84% OFF</span></div>
+                </div>
+                <button class="add-to-cart" onclick="addToCart('NE555 Timer IC Precision Oscillator (20 Pcs)', 55.00, event)">Add to Cart</button>
+            </div>
+
+            <!-- Product 18 -->
+            <div class="product-card" onclick="openDynamicModal('pir-esnsor', './hc-sr501-_pir-esnsor.png', '132.00', '98.00', '25.19% OFF', ['Detects human motion using infrared radiation','Consumes low power during operation','Commonly used in security and automation systems'], 'https://www.amazon.in/Electronic-Spices-HC-SR501-Pyroelectric-Microcontrollers/dp/B09MZ7STTW/ref=sr_1_6?crid=3842PMNCSL61S&dib=eyJ2IjoiMSJ9.T3dld2bS7ywlaTV3jn3dxlxbCaOnHWUgiJ4wi9KI2siDOnD7U-xpJMwShbJZ7m2-IIB6BWHdWhsRX05V486kDnpJSK8pLEimOXMbC5UnrhWsse1sRMrQOfWOj2yqmHpyqt3e3U0vQc41UFIi-Kj-EL-POD-_5MznXzNmMuf4wGw3TLeVVTbq4b1zmHQbbS5DuBpBeM1saOsZE3xx_TEfK0r1RGUx2fe-genhJOe3z-bVOoRhYmWzgf5Daziz-FUHVBz9AXvRkbdZnTyqeqc96fU62aS9CN7mSRYVBbV6cew.L9U0fj29E-VIKKfRrs5tPSEReJcDFFMHib4dK5y6sg8&dib_tag=se&keywords=pir%2Bsensor&qid=1784448627&sprefix=pir%2Bsenso%2Caps%2C303&sr=8-6&th=1', '128.00', 'https://www.flipkart.com/cam-cart-hc-sr501-hc-sr501-adjust-infrared-ir-pir-motion-sensor-power-supply-electronic-hobby-kit/p/itmf58aa09181eb5?pid=EHKFWKNHJ7EG83AY&lid=LSTEHKFWKNHJ7EG83AYFX3D7Y&marketplace=FLIPKART&q=pir+sensor&store=search.flipkart.com&srno=s_1_2&otracker=search&otracker1=search&fm=Search&iid=148b51ce-4d0d-4f65-88bd-b81d30713e0f.EHKFWKNHJ7EG83AY.SEARCH&ppt=sp&ppn=sp&ssid=t81c8iy2ww0000001784448368929&qH=e49cae0251f5620d&ov_redirect=true&ov_redirect=true', '132.00')">
+                <img src="C:\Users\Admin\Desktop\VRS website\hc-sr501-_pir-esnsor.png" alt="RasPi" class="product-img">
+                <h3 class="product-title">PIR sensor</h3>
+                <div class="pricing-info">
+                    <span class="mrp-box">MRP: ₹132.00</span>
+                    <div><span class="real-price">₹98.00</span> <span class="discount-badge">25.19% OFF</span></div>
+                </div>
+                <button class="add-to-cart" onclick="addToCart('PIR sensor', 98.00, event)">Add to Cart</button>
+            </div>
+
+            <!-- Product 19 -->
+            <!-- <div class="product-card" onclick="openDynamicModal('500 Pcs 5mm LED Assortment Kit', 'https://placehold.co/400x400/ffffff/333333?text=LEDs', '350.00', '210.00', '40% OFF', ['Red, Green, Blue, Yellow, White', 'Ultra bright', 'Voltage 2V-3V'], 'https://www.amazon.in/Electronic-Spices-HC-SR501-Pyroelectric-Microcontrollers/dp/B09MZ7STTW/ref=sr_1_6?crid=3842PMNCSL61S&dib=eyJ2IjoiMSJ9.T3dld2bS7ywlaTV3jn3dxlxbCaOnHWUgiJ4wi9KI2siDOnD7U-xpJMwShbJZ7m2-IIB6BWHdWhsRX05V486kDnpJSK8pLEimOXMbC5UnrhWsse1sRMrQOfWOj2yqmHpyqt3e3U0vQc41UFIi-Kj-EL-POD-_5MznXzNmMuf4wGw3TLeVVTbq4b1zmHQbbS5DuBpBeM1saOsZE3xx_TEfK0r1RGUx2fe-genhJOe3z-bVOoRhYmWzgf5Daziz-FUHVBz9AXvRkbdZnTyqeqc96fU62aS9CN7mSRYVBbV6cew.L9U0fj29E-VIKKfRrs5tPSEReJcDFFMHib4dK5y6sg8&dib_tag=se&keywords=pir%2Bsensor&qid=1784448627&sprefix=pir%2Bsenso%2Caps%2C303&sr=8-6&th=1', '240.00', 'https://www.flipkart.com/cam-cart-hc-sr501-hc-sr501-adjust-infrared-ir-pir-motion-sensor-power-supply-electronic-hobby-kit/p/itmf58aa09181eb5?pid=EHKFWKNHJ7EG83AY&lid=LSTEHKFWKNHJ7EG83AYFX3D7Y&marketplace=FLIPKART&q=pir+sensor&store=search.flipkart.com&srno=s_1_2&otracker=search&otracker1=search&fm=Search&iid=148b51ce-4d0d-4f65-88bd-b81d30713e0f.EHKFWKNHJ7EG83AY.SEARCH&ppt=sp&ppn=sp&ssid=t81c8iy2ww0000001784448368929&qH=e49cae0251f5620d&ov_redirect=true&ov_redirect=true', '230.00')"> -->
+                <!-- <img src="https://placehold.co/400x400/ffffff/333333?text=LEDs" alt="LEDs" class="product-img"> -->
+                <!-- <h3 class="product-title">500 Pcs 5mm LED Assortment Kit</h3> -->
+                <!-- <div class="pricing-info"> -->
+                    <!-- <span class="mrp-box">MRP: ₹350.00</span> -->
+                    <!-- <div><span class="real-price">₹210.00</span> <span class="discount-badge">40% OFF</span></div> -->
+                <!-- </div> -->
+                <!-- <button class="add-to-cart" onclick="addToCart('500 Pcs 5mm LED Assortment Kit', 210.00, event)">Add to Cart</button> -->
+            <!-- </div> -->
+
+            <!-- Product 20 -->
+            <!-- <div class="product-card" onclick="openDynamicModal('9V Battery Clip Connector I-Type (10 Pack)', 'https://placehold.co/400x400/ffffff/333333?text=Battery+Clip', '90.00', '50.00', '44% OFF', ['I-Type connector', '15cm stranded wire', 'Faux leather shell'], '#', '65.00', '#', '55.00')"> -->
+                <!-- <img src="https://placehold.co/400x400/ffffff/333333?text=Battery+Clip" alt="Clip" class="product-img"> -->
+                <!-- <h3 class="product-title">9V Battery Clip Connector I-Type (10 Pack)</h3> -->
+                <!-- <div class="pricing-info"> -->
+                    <!-- <span class="mrp-box">MRP: ₹90.00</span> -->
+                    <!-- <div><span class="real-price">₹50.00</span> <span class="discount-badge">44% OFF</span></div> -->
+                <!-- </div> -->
+                <!-- <button class="add-to-cart" onclick="addToCart('9V Battery Clip Connector I-Type (10 Pack)', 50.00, event)">Add to Cart</button> -->
+            <!-- </div> -->
+
+            <!-- Book 1 (No Popup) -->
+<div class="product-card">
+    <img src="C:\Users\Admin\Desktop\VRS website\colour book.png" alt="Book 1" class="product-img">
+    <h3 class="product-title">Projects Manual(Multi Colour printed)</h3>
+    <div class="pricing-info">
+        <span class="mrp-box">MRP: ₹450.00</span>
+        <div><span class="real-price">₹350.00</span> <span class="discount-badge">22.22% OFF</span></div>
+    </div>
+    <button class="add-to-cart" onclick="addToCart('Projects Manual(Multi Colour printed)', 350.00, event)">Add to Cart</button>
+</div>
+
+<!-- Book 2 (No Popup) -->
+<div class="product-card">
+    <img src="C:\Users\Admin\Desktop\VRS website\black and white.png" alt="Book 2" class="product-img">
+    <h3 class="product-title">Project Manual(Black and white colour printed)</h3>
+    <div class="pricing-info">
+        <span class="mrp-box">MRP: ₹200.00</span>
+        <div><span class="real-price">₹150.00</span> <span class="discount-badge">25% OFF</span></div>
+    </div>
+    <button class="add-to-cart" onclick="addToCart('Project Manual(Black and white colour printed)', 150.00, event)">Add to Cart</button>
+</div>
+
+        </div>
+    </main>
+
+    <!-- The ONE Dynamic Product Modal -->
+    <div class="overlay" id="dynamic-product-modal" onclick="closeModal(event, this)">
+        <div class="modal" style="display: flex; flex-wrap: wrap; gap: 20px;">
+            <button class="close-btn" onclick="document.getElementById('dynamic-product-modal').classList.remove('active'); document.body.style.overflow = 'auto';">&times;</button>
+            
+            <div style="flex: 1; min-width: 250px;">
+                <img id="modal-img" src="" alt="Product Detail" style="width: 100%; border-radius: 4px; background: white; object-fit: contain;">
+            </div>
+            
+            <div style="flex: 1.5; min-width: 300px;">
+                <h2 id="modal-title" style="font-size: 22px; margin-bottom: 15px;">Title</h2>
+                
+                <div class="pricing-info" style="border-bottom: 1px solid #ddd; padding-bottom: 15px; margin-bottom: 15px;">
+                    <span id="modal-mrp" class="mrp-box">MRP: ₹0.00</span>
+                    <div>
+                        <span id="modal-price" class="real-price">₹0.00</span> 
+                        <span id="modal-discount" class="discount-badge">0% OFF</span>
+                    </div>
+                </div>
+                
+                <ul id="modal-features" style="font-size: 14px; line-height: 1.8; margin-left: 20px; color: #333;">
+                    <!-- JS injects features here -->
+                </ul>
+                
+                <button class="add-to-cart" onclick="addCurrentProductToCart()" style="margin-top: 20px; padding: 12px; font-weight: bold;"><i class="fa-solid fa-cart-plus"></i> Add to Cart</button>
+
+                <!-- Comparison Links Section (Updates with specific prices) -->
+                <div class="compare-section">
+                    <p style="font-size: 14px; color: #555; font-weight: bold;">Compare Prices:</p>
+                    <div class="compare-buttons">
+                        <a href="#" id="amz-link" target="_blank" class="btn-amz">
+                            <i class="fa-brands fa-amazon"></i> Amazon: <span id="amz-price">₹0</span>
+                        </a>
+                        <a href="#" id="fk-link" target="_blank" class="btn-fk">
+                            Flipkart: <span id="fk-price">₹0</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shopping Cart Modal -->
+    <div class="overlay" id="cart-modal" onclick="closeModal(event, this)">
+        <div class="modal" style="max-width: 500px;">
+            <button class="close-btn" onclick="document.getElementById('cart-modal').classList.remove('active'); document.body.style.overflow = 'auto';">&times;</button>
+            <h2 style="margin-bottom: 15px;">Shopping Cart</h2>
+            
+            <!-- Cart Items load here dynamically -->
+            <div id="cart-items-container" style="border-top: 1px solid #ddd; padding-top: 15px; max-height: 40vh; overflow-y: auto;">
+                <p style="color: #666;">Your cart is empty.</p>
+            </div>
+            
+            <hr style="margin: 15px 0; border: 0; border-top: 1px solid #ddd;">
+            <div style="display:flex; justify-content:space-between; font-size: 20px;">
+                <strong>Total Amount:</strong>
+                <strong id="cart-total" style="color: #B12704;">₹0.00</strong>
+            </div>
+            <button class="add-to-cart" style="width: 100%; margin-top: 20px; padding: 15px; font-size: 16px;">Proceed to Checkout</button>
+        </div>
+    </div>
+
+    <script>
+        // --- CART SYSTEM LOGIC ---
+        let cartItems = [];
+        let cartTotal = 0;
+        let activeProduct = null; // Stores the item currently open in the popup
+
+        // Function called when clicking 'Add to Cart' anywhere
+        function addToCart(title, price, event) {
+            // Stops the click from also triggering the background product card click
+            if(event) event.stopPropagation(); 
+            
+            // Add mathematically
+            cartItems.push({ title: title, price: parseFloat(price) });
+            cartTotal += parseFloat(price);
+            
+            // Update UI
+            document.getElementById('cart-badge').innerText = cartItems.length;
+            updateCartModalUI();
+            
+            alert(title + " was added to your cart!");
+        }
+
+        // Bridge function for the 'Add to Cart' button inside the Popup
+        function addCurrentProductToCart() {
+            if(activeProduct) {
+                addToCart(activeProduct.title, activeProduct.price, null);
+            }
+        }
+
+        // Refreshes the HTML inside the Shopping Cart popup
+        function updateCartModalUI() {
+            const container = document.getElementById('cart-items-container');
+            container.innerHTML = ''; // Clear out old list
+
+            if (cartItems.length === 0) {
+                container.innerHTML = '<p style="color: #666;">Your cart is empty.</p>';
+            } else {
+                cartItems.forEach(item => {
+                    let div = document.createElement('div');
+                    div.style.display = 'flex';
+                    div.style.justifyContent = 'space-between';
+                    div.style.marginBottom = '12px';
+                    div.style.fontSize = '14px';
+                    
+                    div.innerHTML = `<span>${item.title}</span> <strong>₹${item.price.toFixed(2)}</strong>`;
+                    container.appendChild(div);
+                });
+            }
+
+            // Update Total Sum
+            document.getElementById('cart-total').innerText = '₹' + cartTotal.toFixed(2);
+        }
+
+        // --- DYNAMIC POPUP LOGIC ---
+        function openDynamicModal(title, imageSrc, mrp, price, discount, featuresArray, amzUrl, amzPrice, fkUrl, fkPrice) {
+            
+            // Save active product details so the Cart button inside the popup knows what to add
+            activeProduct = { title: title, price: price };
+
+            // Swap Text & Image
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-img').src = imageSrc;
+            document.getElementById('modal-mrp').innerText = "MRP: ₹" + mrp;
+            document.getElementById('modal-price').innerText = "₹" + price;
+            document.getElementById('modal-discount').innerText = discount;
+            
+            // Map URLs and custom prices to the Amazon and Flipkart buttons
+            document.getElementById('amz-link').href = amzUrl;
+            document.getElementById('amz-price').innerText = "₹" + amzPrice;
+            document.getElementById('fk-link').href = fkUrl;
+            document.getElementById('fk-price').innerText = "₹" + fkPrice;
+
+            // Update Features List
+            const featuresList = document.getElementById('modal-features');
+            featuresList.innerHTML = ''; 
+            
+            featuresArray.forEach(feature => {
+                let li = document.createElement('li');
+                li.innerText = feature;
+                featuresList.appendChild(li);
+            });
+
+            // Open Modal
+            document.getElementById('dynamic-product-modal').classList.add('active');
+            document.body.style.overflow = 'hidden'; 
+        }
+
+        // Close Modal Handler (Used for both product and cart modals)
+        function closeModal(event, element) {
+            if (event.target === element) {
+                element.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        }
+    </script>
+</body>
+</html>
